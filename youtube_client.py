@@ -1,7 +1,7 @@
-import creds
-
 import google_auth_oauthlib.flow
 from googleapiclient.discovery import build
+
+import creds
 
 class YoutubeClient(object):
     def __init__(self):
@@ -17,7 +17,10 @@ class YoutubeClient(object):
         self.youtube = build('youtube', 'v3',credentials=credentials)
 
     def video_comments(self, video_id): 
-        video_response = self.youtube.commentThreads().list(part='snippet,replies', videoId=video_id ).execute() 
+        video_response = self.youtube.commentThreads().list(
+            part='snippet,replies', 
+            videoId=video_id 
+        ).execute() 
 
         comments = []
 
@@ -26,7 +29,11 @@ class YoutubeClient(object):
                 comments.append(item['snippet']['topLevelComment']['snippet'])
 
             if 'nextPageToken' in video_response: 
-                video_response = self.youtube.commentThreads().list( part = 'snippet,replies', videoId = video_id, pageToken=video_response["nextPageToken"]).execute() 
+                video_response = self.youtube.commentThreads().list( 
+                    part = 'snippet,replies', 
+                    videoId = video_id, 
+                    pageToken=video_response["nextPageToken"]
+                ).execute() 
             else: 
                 break
 

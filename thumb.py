@@ -1,6 +1,20 @@
 from PIL import Image, ImageDraw,ImageFont
 import requests, os
 
+def download_img(url):
+    response = requests.get(url)
+    file_path = f"temp_imgs/{url.split('/')[-1]}.jpg"
+
+    file = open(file_path, "wb")
+    file.write(response.content)
+    file.close()
+
+    return file_path
+
+def delete_img(url):
+    file_path = f"temp_imgs/{url.split('/')[-1]}.jpg"
+    os.remove(file_path)
+
 def create_thumbnail(comments):
     img = Image.open("temp_imgs/base_img.png")
     draw = ImageDraw.Draw(img)
@@ -21,29 +35,23 @@ def create_thumbnail(comments):
         
         draw = ImageDraw.Draw(img)
         font = ImageFont.truetype("arialbd.ttf", name_size)
-        draw.text((left, name_pos),comment["authorDisplayName"],fill='black',font=font)
+        draw.text((left, name_pos),comment["authorDisplayName"],
+            fill='black',font=font)
 
         font = ImageFont.truetype("arial.ttf", desc_size)
-        draw.text((left + photo_size, top),comment["textOriginal"][:33],fill='black',font=font)
-        draw.text((left + photo_size, top + desc_size),comment["textOriginal"][33:66],fill='black',font=font)
+        draw.text((left + photo_size, top),
+            comment["textOriginal"][:33],
+            fill='black',
+            font=font)
+            
+        draw.text((left + photo_size, top + desc_size),
+            comment["textOriginal"][33:66],
+            fill='black',
+            font=font)
 
         left += comment_size
         delete_img(comment["authorProfileImageUrl"])
 
     final_img = 'temp_imgs/thumb.png'
     img.save(final_img)
-    return 'temp_imgs/thumb.png'
-
-def download_img(url):
-    response = requests.get(url)
-    file_path = f"temp_imgs/{url.split('/')[-1]}.jpg"
-
-    file = open(file_path, "wb")
-    file.write(response.content)
-    file.close()
-
-    return file_path
-
-def delete_img(url):
-    file_path = f"temp_imgs/{url.split('/')[-1]}.jpg"
-    os.remove(file_path)
+    return final_img
